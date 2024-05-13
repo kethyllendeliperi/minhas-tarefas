@@ -4,7 +4,7 @@ import ListaDeTarefas from '../../Containers/ListaDeTarefas'
 
 const Home = () => (
   <>
-    <BarraLateral />
+    <BarraLateral mostrarFiltros />
     <ListaDeTarefas />
     <BotaoAdicionar />
   </>
