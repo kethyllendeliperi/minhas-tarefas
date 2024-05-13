@@ -1,45 +1,74 @@
+import { useSelector } from 'react-redux'
+
 import Tarefa from '../../Components/Tarefa'
-import { Container } from './styles'
+import { Container, Resultado } from './styles'
 
-import * as enums from '../../utils/enums/TarefaEnum'
+import { RootReducer } from '../../store'
 
-const tarefas = [
-  {
-    titulo: 'Estudar TypeScript',
-    descricao: 'Ver a aula 3',
-    prioridade: enums.Priodade.IMPORTANTE,
-    status: enums.Status.PENDENTE
-  },
-  {
-    titulo: 'Pagar internet',
-    descricao: 'Baixar fatura no email',
-    prioridade: enums.Priodade.URGENTE,
-    status: enums.Status.CONCLUIDA
-  },
-  {
-    titulo: 'Academia',
-    descricao: 'Treino B',
-    prioridade: enums.Priodade.IMPORTANTE,
-    status: enums.Status.PENDENTE
+const ListaDeTarefas = () => {
+  const { itens } = useSelector((state: RootReducer) => state.tarefas)
+  const { termo, criterio, valor } = useSelector(
+    (state: RootReducer) => state.filtro
+  )
+
+  const filtraTarefas = () => {
+    let tarefasFiltradas = itens
+    if (termo !== undefined) {
+      tarefasFiltradas = tarefasFiltradas.filter(
+        (item) =>
+          item.titulo.toLocaleLowerCase().search(termo.toLocaleLowerCase()) >= 0
+      )
+
+      if (criterio === 'prioridade') {
+        tarefasFiltradas = tarefasFiltradas.filter(
+          (item) => item.prioridade === valor
+        )
+      } else if (criterio === 'status') {
+        tarefasFiltradas = tarefasFiltradas.filter(
+          (item) => item.status === valor
+        )
+      }
+      return tarefasFiltradas
+    } else {
+      return itens
+    }
   }
-]
 
-const ListaDeTarefas = () => (
-  <Container>
-    <p>2 tarefas marcadas como: &quot;todas&quot; e &quot;termo&quot;</p>
-    <ul>
-      {tarefas.map((t) => (
-        <li key={t.titulo}>
-          <Tarefa
-            descricao={t.descricao}
-            titulo={t.titulo}
-            prioridade={t.prioridade}
-            status={t.status}
-          />
-        </li>
-      ))}
-    </ul>
-  </Container>
-)
+  const exibeFiltragem = (quantidade: number) => {
+    let mensagem = ''
+    const complementacao =
+      termo !== undefined && termo.length > 0 ? `e "${termo}"` : ''
+
+    if (criterio === 'todas') {
+      mensagem = `${quantidade} tarefa(s) encontrada(s) como: "todas" ${complementacao}`
+    } else {
+      mensagem = `${quantidade} tarefa(s) encontrada(s) como: "${`${criterio} = ${valor}`}" ${complementacao}`
+    }
+
+    return mensagem
+  }
+
+  const tarefas = filtraTarefas()
+  const mensagem = exibeFiltragem(tarefas.length)
+
+  return (
+    <Container>
+      <Resultado>{mensagem}</Resultado>
+      <ul>
+        {tarefas.map((t) => (
+          <li key={t.titulo}>
+            <Tarefa
+              id={t.id}
+              descricao={t.descricao}
+              titulo={t.titulo}
+              prioridade={t.prioridade}
+              status={t.status}
+            />
+          </li>
+        ))}
+      </ul>
+    </Container>
+  )
+}
 
 export default ListaDeTarefas

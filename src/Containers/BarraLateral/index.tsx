@@ -1,21 +1,55 @@
+import { useDispatch, useSelector } from 'react-redux'
 import FiltroCard from '../../Components/FiltroCard'
+import { RootReducer } from '../../store'
+import { alterarTermo } from '../../store/reducers/filtro'
 
 import * as S from './styles'
+import * as enums from '../../utils/enums/TarefaEnum'
 
-const BarraLateral = () => (
-  <S.Aside>
-    <div>
-      <S.Campo type="text" placeholder="Buscar" />
-      <S.Filtros>
-        <FiltroCard contador={1} legenda={'Pendentes'} />
-        <FiltroCard contador={2} legenda={'Concluídas'} />
-        <FiltroCard contador={3} legenda={'Urgentes'} />
-        <FiltroCard contador={4} legenda={'Importantes'} />
-        <FiltroCard contador={5} legenda={'Normal'} />
-        <FiltroCard ativo contador={10} legenda={'Todas'} />
-      </S.Filtros>
-    </div>
-  </S.Aside>
-)
+const BarraLateral = () => {
+  const dispatch = useDispatch()
+  const { termo } = useSelector((state: RootReducer) => state.filtro)
+
+  return (
+    <S.Aside>
+      <div>
+        <S.Campo
+          type="text"
+          placeholder="Buscar"
+          value={termo}
+          onChange={(evento) => dispatch(alterarTermo(evento.target.value))}
+        />
+        <S.Filtros>
+          <FiltroCard
+            valor={enums.Status.PENDENTE}
+            criterio="status"
+            legenda="Pendentes"
+          />
+          <FiltroCard
+            valor={enums.Status.CONCLUIDA}
+            criterio="status"
+            legenda="Concluídas"
+          />
+          <FiltroCard
+            valor={enums.Prioridade.URGENTE}
+            criterio="prioridade"
+            legenda="Urgentes"
+          />
+          <FiltroCard
+            valor={enums.Prioridade.IMPORTANTE}
+            criterio="prioridade"
+            legenda="Importantes"
+          />
+          <FiltroCard
+            valor={enums.Prioridade.NORMAL}
+            criterio="prioridade"
+            legenda="Habituais"
+          />
+          <FiltroCard criterio="todas" legenda="todas" />
+        </S.Filtros>
+      </div>
+    </S.Aside>
+  )
+}
 
 export default BarraLateral
